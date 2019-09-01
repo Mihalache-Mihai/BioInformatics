@@ -13,11 +13,17 @@ public class Main {
         //TODO - do this for all sequences from seq1.fasta & seq2.fasta
         readSequenceFromFile(filename1, sequences1);
         readSequenceFromFile(filename2, sequences2);
+        String seq1=removeLetters(String.join("",sequences1));
+        String seq2=removeLetters(String.join("",sequences2));
+        calculateTable(true,seq1,seq2,scoreMatrix,gapCost);
+        String[] result = getAlignment(seq1,seq2);
+        System.out.println(result[0] + '\n' + result[1]);
+
+
         calculateTable(true, "AATAAT", "AAGG", scoreMatrix, gapCost);
 
-        Task t = new Task(false, "acta", "aggt", null, 1);
         //table=new int[][]{{0,1,2,3,4},{1,0,1,2,3},{2,1,1,2,3},{3,2,2,2,2},{4,3,3,3,3}};
-        String[] result = getAlignment(t);
+        result = getAlignment("AATAAT", "AAGG");
         System.out.println(result[0] + '\n' + result[1]);
 
 
@@ -48,20 +54,33 @@ public class Main {
     private static ArrayList<String> sequences1 = new ArrayList<>();
     private static ArrayList<String> sequences2 = new ArrayList<>();
 
-    private static String filename1 = "C:\\Users\\Mihai\\IdeaProjects\\BioInformatics\\BioInformatics\\seq1.fasta";
-    private static String filename2 = "C:\\Users\\Mihai\\IdeaProjects\\BioInformatics\\BioInformatics\\seq2.fasta";
+    private static String filename1 = "/home/n/Downloads/seq1.fasta";
+    private static String filename2 = "/home/n/Downloads/seq2.fasta";
 
+    public static String removeLetters(String seq){
+        StringBuilder stringBuilder=new StringBuilder();
+        for(int i=0;i<seq.length();i++){
+            if(charMapping.containsKey(seq.charAt(i))){
+                stringBuilder.append(seq.charAt(i));
+            }
+        }
+        return stringBuilder.toString();
+    }
 
     public static void calculateTable(boolean maximizing, String seq1, String seq2, int[][] scoreMatrix, int gap) {
         int[][] resultedMatrix = new int[seq2.length() + 1][seq1.length() + 1];
-        paths = new Operation[seq2.length()][seq1.length()];
+        paths = new Operation[seq2.length()+1][seq1.length()+1];
 
         resultedMatrix[0][0] = 0;
         for (int i = 1; i < (seq1.length() > seq2.length() ? seq1.length() + 1 : seq2.length() + 1); i++) {
-            if (i < seq1.length() + 1)
+            if (i < seq1.length() + 1) {
+                paths[0][i] = Operation.DEL;
                 resultedMatrix[0][i] = resultedMatrix[0][i - 1] + gap;
-            if (i < seq2.length() + 1)
+            }
+            if (i < seq2.length() + 1) {
+                paths[i][0] = Operation.INS;
                 resultedMatrix[i][0] = resultedMatrix[i - 1][0] + gap;
+            }
         }
         for (int row = 1; row < resultedMatrix.length; row++) {
             for (int column = 1; column < resultedMatrix[0].length; column++) {
@@ -88,7 +107,7 @@ public class Main {
                     }
                 }
                 resultedMatrix[row][column] = expectedValue;
-                paths[row - 1][column - 1] = op;
+                paths[row][column] = op;
             }
         }
 
@@ -144,23 +163,23 @@ public class Main {
 //    }
 
 
-    public String[] getAlignment(Task task) {
+    public String[] getAlignment(String seq1,String seq2) {
         int x = resultTable.length - 1;
         int y = resultTable[0].length - 1;
         StringBuilder result1 = new StringBuilder();
         StringBuilder result2 = new StringBuilder();
         while (x > 0 || y > 0) {
             if (paths[x][y] == Operation.SUB) {
-                result1.insert(0, task.seq1.charAt(x - 1));
-                result2.insert(0, task.seq2.charAt(y - 1));
+                result1.insert(0, seq2.charAt(x - 1));
+                result2.insert(0, seq1.charAt(y - 1));
                 x--;
                 y--;
             } else if (paths[x][y] == Operation.DEL) {
                 result1.insert(0, '_');
-                result2.insert(0, task.seq2.charAt(y - 1));
+                result2.insert(0, seq1.charAt(y - 1));
                 y--;
             } else if (paths[x][y] == Operation.INS) {
-                result1.insert(0, task.seq1.charAt(x - 1));
+                result1.insert(0, seq2.charAt(x - 1));
                 result2.insert(0, '_');
                 x--;
             }
@@ -169,20 +188,4 @@ public class Main {
     }
 }
 
-class Task {
-    public boolean maximizing;
-    public String seq1;
-    public String seq2;
 
-    public Task(boolean maximizing, String seq1, String seq2, int[][] score, int gap) {
-        this.maximizing = maximizing;
-        this.seq1 = seq1;
-        this.seq2 = seq2;
-        this.score = score;
-        this.gap = gap;
-    }
-
-    public int[][] score;
-    public int gap;
-
-}
