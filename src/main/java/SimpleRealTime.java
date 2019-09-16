@@ -23,16 +23,20 @@ public class SimpleRealTime {
 
 
         // Create Chart
-        XYChart chart = QuickChart.getChart(typeOfGraph, "X", "Y", "time", xData, yData);
+        XYChart chart = QuickChart.getChart(typeOfGraph, "n", "R(n)", "R(n)/n", xData, yData);
 
         // Show it
         new SwingWrapper<XYChart>(chart).displayChart();
 
         // Save it
-        BitmapEncoder.saveBitmap(chart, "./Sample_Chart", BitmapFormat.PNG);
+        BitmapEncoder.saveBitmap(chart, "./Sample_Chart" + typeOfGraph, BitmapFormat.PNG);
 
         // or save it in high-res
-        BitmapEncoder.saveBitmapWithDPI(chart, "./Sample_Chart_300_DPI", BitmapFormat.PNG, 300);
+        BitmapEncoder.saveBitmapWithDPI(chart, "./Sample_Chart_300_DPI" + typeOfGraph, BitmapFormat.PNG, 300);
+
+        BitmapEncoder.saveBitmapWithDPI(chart, "./Sample_Chart_400_DPI" + typeOfGraph, BitmapFormat.PNG, 400);
+
+        BitmapEncoder.saveBitmapWithDPI(chart, "./Sample_Chart_500_DPI" + typeOfGraph, BitmapFormat.PNG, 500);
     }
 }
 

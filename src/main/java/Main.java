@@ -13,7 +13,7 @@ public class Main {
     public Main() throws IOException {
         ArrayList<Double> elapsedTime = new ArrayList<>();
         ArrayList<Double> nPlusM = new ArrayList<>();
-        String typeOfGapCost = "linear";
+        String typeOfGapCost = "Linear gap cost";
 
         BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
         System.out.println("Welcome. Please type in the name of a file with the score matrix and gapcost (e.g. score.txt)");
@@ -27,7 +27,7 @@ public class Main {
             gapCost = k -> Integer.parseInt(nmbs[0]);
         } else {
             gapCost = k -> k == 'n' ? Integer.parseInt(nmbs[0]) + Integer.parseInt(nmbs[1]) : Integer.parseInt(nmbs[1]);
-            typeOfGapCost = "affine";
+            typeOfGapCost = "Affine gap cost";
         }
 
 
@@ -57,8 +57,8 @@ public class Main {
                 }
                 long end_time = System.nanoTime();
                 long duration = end_time - start_time;
-                elapsedTime.add((double) duration / 1_000_000_000);
-                nPlusM.add((double)sequences1.get(i).length()+(double)sequences2.get(i).length());
+                elapsedTime.add(((double) duration / 1_000_000_000)/(sequences1.get(i).length()*sequences1.get(i).length())) ;
+                nPlusM.add((double)sequences1.get(i).length());
                 i++;
             }
             //writeAlignment("solution.fastalignment", alignments[1], alignments[1], "seq1","seq2");
