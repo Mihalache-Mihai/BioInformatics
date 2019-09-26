@@ -23,11 +23,12 @@ public class Main2 {
 
     public Main2() {
         readPhyLip("score.txt");
-        ArrayList<String> seqs=readMultipleSeqFile("seq.fasta");
-        doAll(seqs);
+        ArrayList<String> names=new ArrayList();
+        ArrayList<String> seqs=readMultipleSeqFile("seq.fasta",names);
+        doAll(seqs,names);
     }
 
-    private ArrayList<String> readMultipleSeqFile(String filename) {
+    private ArrayList<String> readMultipleSeqFile(String filename, ArrayList<String>names) {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(new File(filename)));
             ArrayList<String> results = new ArrayList<>();
@@ -36,6 +37,7 @@ public class Main2 {
             while (line != null) {
                 line = line.trim();
                 if (line.startsWith(">")) {
+                    names.add(line);
                     String curr = eliminateWhiteSpace(cur.toString());
                     if (cur.length() > 0) {
                         results.add(curr);
@@ -58,7 +60,7 @@ public class Main2 {
         }
     }
 
-    public void doAll(ArrayList<String> sequences) {
+    public void doAll(ArrayList<String> sequences,ArrayList<String> names) {
         int[][] scoreTable = new int[sequences.size()][sequences.size()];
         calculateAllPairAlignments(sequences, scoreTable);
         int minimum = determineMinimalMiddle(scoreTable);
@@ -72,9 +74,12 @@ public class Main2 {
         }
         try {
             PrintWriter writer=new PrintWriter(new File("solution.fasta"));
-            for (int i = 0; i < multiple.size(); i++) {
+            writer.println(names.get(minimum)+" (center sequence)");
+            writer.println(multiple.get(0).toString());
+            for (int i = 1; i < multiple.size(); i++) {
+                int j=i<minimum?i-1:i;
                 System.out.println(multiple.get(i).toString());
-                writer.println(">p");
+                writer.println(names.get(j));
                 writer.println(multiple.get(i).toString());
             }
             writer.close();
@@ -85,6 +90,7 @@ public class Main2 {
     }
 
     public void extendAlignment(ArrayList<StringBuilder> multiple, String middle, String newOne) {
+        System.out.println("L: "+middle.length()+";"+newOne.length());
         if (multiple.size() == 0) {
             multiple.add(new StringBuilder(middle));
             multiple.add(new StringBuilder(newOne));
@@ -108,7 +114,15 @@ public class Main2 {
                 newBuilder.append(newOne.charAt(i));
             }
         }
+        while(mIndex<multiple.get(0).length()){
+          newBuilder.append(GAPCHAR);
+          mIndex++;
+        }
         multiple.add(newBuilder);
+        for(int i=0;i<multiple.size();i++){
+          System.out.print(multiple.get(i).length()+" ;");
+        }
+        System.out.println();
     }
 
     public int determineMinimalMiddle(int[][] scoreTable) {
