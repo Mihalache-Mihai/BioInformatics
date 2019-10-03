@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,7 +23,7 @@ public class SPExactThree {
         this.dMatrix = new int[seq1.length()][seq2.length()][seq3.length()];
     }
 
-    public String calculateSPAlignmentAndScore(int[][] scoreMatrix) {
+    public List<StringBuilder> calculateSPAlignmentAndScore(int[][] scoreMatrix) {
         for (int i = 0; i < seq1.length(); i++) {
             for (int j = 0; j < seq2.length(); j++) {
                 for (int k = 0; k < seq3.length(); k++) {
@@ -100,7 +101,15 @@ public class SPExactThree {
         backtracking(seq1.length() - 1, seq2.length() - 1, seq3.length() - 1, alignSeq1, alignSeq2, alignSeq3, scoreMatrix);
 
 
-        System.out.println("MSA 3 seq ----------");
+	StringBuilder builder1=new StringBuilder();
+	StringBuilder builder2=new StringBuilder();
+	StringBuilder builder3=new StringBuilder();
+        for(int i=alignSeq1.size()-1;i>=0;i--){
+            builder1.append(alignSeq1.get(i));
+            builder2.append(alignSeq2.get(i));
+            builder3.append(alignSeq3.get(i));
+	}
+        /*System.out.println("MSA 3 seq ----------");
         for (int i = alignSeq1.size() - 1; i > -1; i--) {
             System.out.print(alignSeq1.get(i));
         }
@@ -112,13 +121,13 @@ public class SPExactThree {
         for (int i = alignSeq3.size() - 1; i > -1; i--) {
             System.out.print(alignSeq3.get(i));
         }
-        System.out.println("\nMSA 3 seq ----------");
-        return null;
+        System.out.println("\nMSA 3 seq ----------");*/
+        return List.of(builder1,builder2,builder3);
     }
 
     //Needleman–Wunsch algorithm
     public void backtracking(int i, int j, int k, ArrayList<Character> alignSeq1, ArrayList<Character> alignSeq2, ArrayList<Character> alignSeq3, int[][] scoreMatrix) {
-        if (i < 0 || j < 0 || k < 0) return;
+       
         int sijk = scoreMatrix[charMapping.get(seq1.charAt(i))][charMapping.get(seq2.charAt(j))] +
                 scoreMatrix[charMapping.get(seq2.charAt(j))][charMapping.get(seq3.charAt(k))] +
                 scoreMatrix[charMapping.get(seq1.charAt(i))][charMapping.get(seq3.charAt(k))],
@@ -141,37 +150,37 @@ public class SPExactThree {
             alignSeq3.add(seq3.charAt(k));
             backtracking(i - 1, j - 1, k - 1, alignSeq1, alignSeq2, alignSeq3, scoreMatrix);
         }
-        if (i >= 0 && j >= 0 && k > 0 && (dMatrix[i][j][k] == dMatrix[i][j][k - 1] + sk)) {
+        else if (i >= 0 && j >= 0 && k > 0 && (dMatrix[i][j][k] == dMatrix[i][j][k - 1] + sk)) {
             alignSeq1.add('-');
             alignSeq2.add('-');
             alignSeq3.add(seq3.charAt(k));
             backtracking(i, j, k - 1, alignSeq1, alignSeq2, alignSeq3, scoreMatrix);
         }
-        if (i >= 0 && j > 0 && k >= 0 && (dMatrix[i][j][k] == dMatrix[i][j - 1][k] + sj)) {
+        else if (i >= 0 && j > 0 && k >= 0 && (dMatrix[i][j][k] == dMatrix[i][j - 1][k] + sj)) {
             alignSeq1.add('-');
             alignSeq2.add(seq2.charAt(j));
             alignSeq3.add('-');
             backtracking(i, j - 1, k, alignSeq1, alignSeq2, alignSeq3, scoreMatrix);
         }
-        if (i > 0 && j >= 0 && k >= 0 && (dMatrix[i][j][k] == dMatrix[i - 1][j][k] + si)) {
+        else if (i > 0 && j >= 0 && k >= 0 && (dMatrix[i][j][k] == dMatrix[i - 1][j][k] + si)) {
             alignSeq1.add(seq1.charAt(i));
             alignSeq2.add('-');
             alignSeq3.add('-');
             backtracking(i - 1, j, k, alignSeq1, alignSeq2, alignSeq3, scoreMatrix);
         }
-        if (i >= 0 && j > 0 && k > 0 && (dMatrix[i][j][k] == dMatrix[i][j - 1][k - 1] + sjk)) {
+        else if (i >= 0 && j > 0 && k > 0 && (dMatrix[i][j][k] == dMatrix[i][j - 1][k - 1] + sjk)) {
             alignSeq1.add('-');
             alignSeq2.add(seq2.charAt(j));
             alignSeq3.add(seq3.charAt(k));
             backtracking(i, j - 1, k - 1, alignSeq1, alignSeq2, alignSeq3, scoreMatrix);
         }
-        if (i > 0 && j >= 0 && k > 0 && (dMatrix[i][j][k] == dMatrix[i - 1][j][k - 1] + sik)) {
+       else  if (i > 0 && j >= 0 && k > 0 && (dMatrix[i][j][k] == dMatrix[i - 1][j][k - 1] + sik)) {
             alignSeq1.add(seq1.charAt(i));
             alignSeq2.add('-');
             alignSeq3.add(seq3.charAt(k));
             backtracking(i - 1, j, k - 1, alignSeq1, alignSeq2, alignSeq3, scoreMatrix);
         }
-        if (i > 0 && j > 0 && k >= 0 && (dMatrix[i][j][k] == dMatrix[i - 1][j - 1][k] + sij)) {
+       else  if (i > 0 && j > 0 && k >= 0 && (dMatrix[i][j][k] == dMatrix[i - 1][j - 1][k] + sij)) {
             alignSeq1.add(seq1.charAt(i));
             alignSeq2.add(seq2.charAt(j));
             alignSeq3.add('-');

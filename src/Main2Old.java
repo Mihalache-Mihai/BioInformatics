@@ -1,6 +1,5 @@
 import java.io.*;
 import java.util.ArrayList;
-import java.util.List;
 
 public class Main2 {
 
@@ -8,12 +7,12 @@ public class Main2 {
     private static final boolean MAXIMIZING = false;
 
 
-    public enum Operation {
+    private enum Operation {
         SUB, INS, DEL
     }
 
 
-    private int[][] scoreMatrix = null;
+    private int[][] score = null;
     private ArrayList<Character> alphabet = new ArrayList<>();
 
     private static Operation[][] paths;
@@ -26,10 +25,7 @@ public class Main2 {
         readPhyLip("score.txt");
         ArrayList<String> names=new ArrayList();
         ArrayList<String> seqs=readMultipleSeqFile("seq.fasta",names);
-        SPExactThree spExactThree = new SPExactThree(seqs.get(0),seqs.get(1),seqs.get(2),GAPCOST);
-        List<StringBuilder> sol=spExactThree.calculateSPAlignmentAndScore(scoreMatrix);
-        writeSolutionToFile(sol,names,0);        
-//doAll(seqs,names);
+        doAll(seqs,names);
     }
 
     private ArrayList<String> readMultipleSeqFile(String filename, ArrayList<String>names) {
@@ -64,11 +60,22 @@ public class Main2 {
         }
     }
 
-    public void writeSolutionToFile(List<StringBuilder> multiple,ArrayList<String> names,int minimum){
-	try {
+    public void doAll(ArrayList<String> sequences,ArrayList<String> names) {
+        int[][] scoreTable = new int[sequences.size()][sequences.size()];
+        calculateAllPairAlignments(sequences, scoreTable);
+        int minimum = determineMinimalMiddle(scoreTable);
+        ArrayList<StringBuilder> multiple = new ArrayList<>();
+        for (int i = 0; i < sequences.size(); i++) {
+            if (i != minimum) {
+                linear_table(MAXIMIZING,sequences.get(minimum),sequences.get(i),this.score,GAPCOST);
+                String[] aligns = getAlignment(sequences.get(minimum), sequences.get(i));
+                extendAlignment(multiple, aligns[0], aligns[1]);
+            }
+        }
+        try {
             PrintWriter writer=new PrintWriter(new File("solution.fasta"));
             writer.println(names.get(minimum)+" (center sequence)");
-	    writer.println(multiple.get(0).toString());
+            writer.println(multiple.get(0).toString());
             for (int i = 1; i < multiple.size(); i++) {
                 int j=i<minimum?i-1:i;
                 System.out.println(multiple.get(i).toString());
@@ -80,21 +87,6 @@ public class Main2 {
             e.printStackTrace();
             return;
         }
-    }
-
-    public void doAll(ArrayList<String> sequences,ArrayList<String> names) {
-        int[][] scoreTable = new int[sequences.size()][sequences.size()];
-        calculateAllPairAlignments(sequences, scoreTable);
-        int minimum = determineMinimalMiddle(scoreTable);
-        ArrayList<StringBuilder> multiple = new ArrayList<>();
-        for (int i = 0; i < sequences.size(); i++) {
-            if (i != minimum) {
-                linear_table(MAXIMIZING,sequences.get(minimum),sequences.get(i),this.scoreMatrix,GAPCOST);
-                String[] aligns = getAlignment(sequences.get(minimum), sequences.get(i));
-                extendAlignment(multiple, aligns[0], aligns[1]);
-            }
-        }
-        writeSolutionToFile(multiple,names,minimum);
     }
 
     public void extendAlignment(ArrayList<StringBuilder> multiple, String middle, String newOne) {
@@ -152,7 +144,7 @@ public class Main2 {
     public void calculateAllPairAlignments(ArrayList<String> seqs, int[][] scoreTable) {
         for (int i = 0; i < seqs.size(); i++) {
             for (int j = i + 1; j < seqs.size(); j++) {
-                int cost = linear_alignment_cost(MAXIMIZING, seqs.get(i), seqs.get(j), this.scoreMatrix, GAPCOST);
+                int cost = linear_alignment_cost(MAXIMIZING, seqs.get(i), seqs.get(j), this.score, GAPCOST);
                 scoreTable[i][j] = cost;
                 scoreTable[j][i] = cost;
             }
@@ -306,7 +298,7 @@ public class Main2 {
                 }
                 line = reader.readLine();
             }
-            this.scoreMatrix = new int[matrixLines.size()][matrixLines.size()];
+            this.score = new int[matrixLines.size()][matrixLines.size()];
             for (int i = 0; i < matrixLines.size(); i++) {
                 this.alphabet.add(matrixLines.get(i).charAt(0));
                 line = matrixLines.get(i).substring(2);
@@ -317,7 +309,7 @@ public class Main2 {
                         l++;
                         continue;
                     }
-                    this.scoreMatrix[i][j - l] = Integer.parseInt(nmbs[j]);
+                    this.score[i][j - l] = Integer.parseInt(nmbs[j]);
                 }
             }
 
