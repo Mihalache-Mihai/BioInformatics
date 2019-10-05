@@ -1,96 +1,53 @@
 import java.io.*;
 import java.util.ArrayList;
+import java.util.List;
 
-public class Main2 {
+public class sp_approx {
 
     private static final int GAPCOST = 5;
     private static final boolean MAXIMIZING = false;
 
 
-    private enum Operation {
+    public enum Operation {
         SUB, INS, DEL
     }
 
 
-    private int[][] score = null;
+    private int[][] scoreMatrix;
     private ArrayList<Character> alphabet = new ArrayList<>();
 
     private static Operation[][] paths;
 
     public static void main(String[] args) {
-        new Main2();
+        new sp_approx(args.length>0?args[0]:"seq.fasta");
     }
 
-    public Main2() {
-        readPhyLip("score.txt");
+    public sp_approx(String filename) {
+        scoreMatrix=Main2.readPhyLip("score.txt",alphabet);
         ArrayList<String> names=new ArrayList();
-        ArrayList<String> seqs=readMultipleSeqFile("seq.fasta",names);
+        ArrayList<String> seqs=Main2.readMultipleSeqFile(filename,names);       
         doAll(seqs,names);
     }
 
-    private ArrayList<String> readMultipleSeqFile(String filename, ArrayList<String>names) {
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(new File(filename)));
-            ArrayList<String> results = new ArrayList<>();
-            StringBuilder cur = new StringBuilder();
-            String line = reader.readLine();
-            while (line != null) {
-                line = line.trim();
-                if (line.startsWith(">")) {
-                    names.add(line);
-                    String curr = eliminateWhiteSpace(cur.toString());
-                    if (cur.length() > 0) {
-                        results.add(curr);
-                        cur = new StringBuilder();
-                    }
-                } else if(!line.startsWith(";")) {
-                    cur.append(line);
-                }
+   
 
-                line = reader.readLine();
-            }
-            String curr = eliminateWhiteSpace(cur.toString());
-            if (cur.length() > 0) {
-                results.add(curr);
-            }
-            return results;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public void doAll(ArrayList<String> sequences,ArrayList<String> names) {
+    public void doAll(ArrayList<String> sequences, ArrayList<String> names) {
         int[][] scoreTable = new int[sequences.size()][sequences.size()];
         calculateAllPairAlignments(sequences, scoreTable);
         int minimum = determineMinimalMiddle(scoreTable);
         ArrayList<StringBuilder> multiple = new ArrayList<>();
         for (int i = 0; i < sequences.size(); i++) {
             if (i != minimum) {
-                linear_table(MAXIMIZING,sequences.get(minimum),sequences.get(i),this.score,GAPCOST);
+                linear_table(MAXIMIZING, sequences.get(minimum), sequences.get(i), this.scoreMatrix, GAPCOST);
                 String[] aligns = getAlignment(sequences.get(minimum), sequences.get(i));
                 extendAlignment(multiple, aligns[0], aligns[1]);
             }
         }
-        try {
-            PrintWriter writer=new PrintWriter(new File("solution.fasta"));
-            writer.println(names.get(minimum)+" (center sequence)");
-            writer.println(multiple.get(0).toString());
-            for (int i = 1; i < multiple.size(); i++) {
-                int j=i<minimum?i-1:i;
-                System.out.println(multiple.get(i).toString());
-                writer.println(names.get(j));
-                writer.println(multiple.get(i).toString());
-            }
-            writer.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return;
-        }
+        Main2.writeSolutionToFile(multiple, names, minimum);
     }
 
     public void extendAlignment(ArrayList<StringBuilder> multiple, String middle, String newOne) {
-        System.out.println("L: "+middle.length()+";"+newOne.length());
+        System.out.println("L: " + middle.length() + ";" + newOne.length());
         if (multiple.size() == 0) {
             multiple.add(new StringBuilder(middle));
             multiple.add(new StringBuilder(newOne));
@@ -102,7 +59,7 @@ public class Main2 {
             if (middle.charAt(i) == GAPCHAR) {
                 newBuilder.append(newOne.charAt(i));
                 for (int j = 0; j < multiple.size(); j++) {
-                    multiple.get(j).insert( mIndex,GAPCHAR);
+                    multiple.get(j).insert(mIndex, GAPCHAR);
                 }
                 mIndex++;
             } else if (multiple.get(0).charAt(mIndex) == GAPCHAR) {
@@ -114,13 +71,13 @@ public class Main2 {
                 newBuilder.append(newOne.charAt(i));
             }
         }
-        while(mIndex<multiple.get(0).length()){
-          newBuilder.append(GAPCHAR);
-          mIndex++;
+        while (mIndex < multiple.get(0).length()) {
+            newBuilder.append(GAPCHAR);
+            mIndex++;
         }
         multiple.add(newBuilder);
-        for(int i=0;i<multiple.size();i++){
-          System.out.print(multiple.get(i).length()+" ;");
+        for (int i = 0; i < multiple.size(); i++) {
+            System.out.print(multiple.get(i).length() + " ;");
         }
         System.out.println();
     }
@@ -144,14 +101,15 @@ public class Main2 {
     public void calculateAllPairAlignments(ArrayList<String> seqs, int[][] scoreTable) {
         for (int i = 0; i < seqs.size(); i++) {
             for (int j = i + 1; j < seqs.size(); j++) {
-                int cost = linear_alignment_cost(MAXIMIZING, seqs.get(i), seqs.get(j), this.score, GAPCOST);
+                int cost = linear_alignment_cost(MAXIMIZING, seqs.get(i), seqs.get(j), this.scoreMatrix, GAPCOST);
                 scoreTable[i][j] = cost;
                 scoreTable[j][i] = cost;
             }
         }
     }
 
-    private static final char GAPCHAR='-';
+    private static final char GAPCHAR = '-';
+
     public String[] getAlignment(String seq1, String seq2) {
         int x = seq2.length();
         int y = seq1.length();
@@ -173,7 +131,7 @@ public class Main2 {
                 x--;
             }
         }
-        return new String[]{result2.toString(), result1.toString()};
+        return new String[] { result2.toString(), result1.toString() };
     }
 
     public int[][] linear_table(boolean maximizing, String seq1, String seq2, int[][] scoreMatrix, int gap) {
@@ -193,7 +151,8 @@ public class Main2 {
         }
         for (int row = 1; row < resultedMatrix.length; row++) {
             for (int column = 1; column < resultedMatrix[0].length; column++) {
-                int subcost = scoreMatrix[alphabet.indexOf(seq2.charAt(row - 1))][alphabet.indexOf(seq1.charAt(column - 1))];
+                int subcost = scoreMatrix[alphabet.indexOf(seq2.charAt(row - 1))][alphabet
+                        .indexOf(seq1.charAt(column - 1))];
                 int expectedValue = subcost + resultedMatrix[row - 1][column - 1];
                 Operation op = Operation.SUB;
                 if (maximizing) {
@@ -224,7 +183,6 @@ public class Main2 {
 
     }
 
-
     public int linear_alignment_cost(boolean maximizing, String seq1, String seq2, int[][] scoreMatrix, int gap) {
         int[][] resultedMatrix = new int[seq2.length() + 1][seq1.length() + 1];
 
@@ -239,7 +197,8 @@ public class Main2 {
         }
         for (int row = 1; row < resultedMatrix.length; row++) {
             for (int column = 1; column < resultedMatrix[0].length; column++) {
-                int subcost = scoreMatrix[alphabet.indexOf(seq2.charAt(row - 1))][alphabet.indexOf(seq1.charAt(column - 1))];
+                int subcost = scoreMatrix[alphabet.indexOf(seq2.charAt(row - 1))][alphabet
+                        .indexOf(seq1.charAt(column - 1))];
                 int expectedValue = subcost + resultedMatrix[row - 1][column - 1];
                 Operation op = Operation.SUB;
                 if (maximizing) {
@@ -269,55 +228,5 @@ public class Main2 {
 
     }
 
-    /**
-     * FILE READING
-     */
 
-    private String eliminateWhiteSpace(String s) {
-        if (s == null) {
-            return null;
-        }
-        return s.replaceAll(" ", "").replaceAll("\t", "").replaceAll("\n", "");
-    }
-
-
-    /**
-     * Reads in a file with a gapcost and a scorematrix, defines the alphabet (see project-information (2))
-     *
-     * @param filename which file
-     */
-    private void readPhyLip(String filename) {
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(new File(filename)));
-
-            ArrayList<String> matrixLines = new ArrayList();
-            String line = reader.readLine();
-            while (line != null) {
-                if (line.length() > 1) {
-                    matrixLines.add(line);
-                }
-                line = reader.readLine();
-            }
-            this.score = new int[matrixLines.size()][matrixLines.size()];
-            for (int i = 0; i < matrixLines.size(); i++) {
-                this.alphabet.add(matrixLines.get(i).charAt(0));
-                line = matrixLines.get(i).substring(2);
-                String[] nmbs = line.split(" ");
-                int l = 0;
-                for (int j = 0; j < nmbs.length; j++) {
-                    if (nmbs[j].equals("")) {
-                        l++;
-                        continue;
-                    }
-                    this.score[i][j - l] = Integer.parseInt(nmbs[j]);
-                }
-            }
-
-        } catch (FileNotFoundException e) {
-            System.out.println("File " + filename + " not found!");
-        } catch (Exception e) {
-            System.out.println("Invalid format!");
-        }
-
-    }
 }
