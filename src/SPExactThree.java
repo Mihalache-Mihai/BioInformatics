@@ -1,7 +1,4 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class SPExactThree {
 
@@ -122,7 +119,7 @@ public class SPExactThree {
             System.out.print(alignSeq3.get(i));
         }
         System.out.println("\nMSA 3 seq ----------");*/
-        return List.of(builder1,builder2,builder3);
+        return Arrays.asList(builder1, builder2, builder3);
     }
 
     //Needleman–Wunsch algorithm
