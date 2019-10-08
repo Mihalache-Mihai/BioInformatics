@@ -9,17 +9,20 @@
 	We implemented the two methods and do not know of any unsolved issues.
 
 	\section{Methods}
-	Invoke the java files sp_exact_3 or sp_approx to run the algorithms. The algorithms take the first commandline argument as name of the sequence file, if no argument is given they choose "seq.fasta" as default. The solution is written to the file "solution.fasta". (Make sure that "score.txt" is in the same directory).
+	Invoke the java files sp\_exact\_3 or sp\_approx to run the algorithms. The algorithms take the first commandline argument as name of the sequence file, if no argument is given they choose "seq.fasta" as default. The solution is written to the file "solution.fasta". (Make sure that "score.txt" is in the same directory).
 	\\
-	%Guys, here write one paragraph about your implementation and verification
+	The exact 3 algorithm is implemented by creating a 3-dimensional matrix where we computed the optimal score of the 3 sequences. At each iteration, we compute up to 7 different values, and we choose the minimum of all. After we have finished with the matrix, we have the optimal score on its last cell. Knowing that, we do a backtracking from that point towards the beginning of the sequence and we check where did that value come from and put the result into the alignment strings. We verified that score of the alignment is the same as it is in the \textit{testdata\_short.txt} and \textit{testdata\_long.txt} by checking each result with \textit{msa_sp_score_3k.py}.
 	\\
 	The approximation algorithm is implemented as in the slides by a method "doAll" and calls "calculateAllPairAlignments" (use solution of the earlier projects), "determineMinimalMiddle" and "extendAlignment". We verified that it is coming close to the optimal solutions.
-	
+
 	\section{Experiments}
-	The score of an optimal alignment of the first 3 sequences is %here the correct solution
-	and the alignment looks like %fill out this
-	\\
+
+	The score of an optimal alignment of the first 3 sequences is 790.
 	The score of the first 5 sequences is 3310 and bos\_taurus is the center string.
 	\\
-	%here make the plotting task
+	\begin{figure}[h]
+  \includegraphics[width=\linewidth]{plotRatio.png}
+  \caption{Plot ration sp\_approx/sp\_exact\_3}
+  \label{fig:microservQuestion}
+\end{figure}
 	\end{document}
