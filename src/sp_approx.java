@@ -1,6 +1,4 @@
-import java.io.*;
 import java.util.ArrayList;
-import java.util.List;
 
 public class sp_approx {
 
@@ -19,17 +17,16 @@ public class sp_approx {
     private static Operation[][] paths;
 
     public static void main(String[] args) {
-        new sp_approx(args.length>0?args[0]:"seq.fasta");
+        new sp_approx(args.length > 0 ? args[0] : "seq.fasta");
     }
 
     public sp_approx(String filename) {
-        scoreMatrix=Main2.readPhyLip("score.txt",alphabet);
-        ArrayList<String> names=new ArrayList();
-        ArrayList<String> seqs=Main2.readMultipleSeqFile(filename,names);       
-        doAll(seqs,names);
+        scoreMatrix = Main2.readPhyLip("score.txt", alphabet);
+        ArrayList<String> names = new ArrayList();
+        ArrayList<String> seqs = Main2.readMultipleSeqFile(filename, names);
+        doAll(seqs, names);
     }
 
-   
 
     public void doAll(ArrayList<String> sequences, ArrayList<String> names) {
         int[][] scoreTable = new int[sequences.size()][sequences.size()];
@@ -131,7 +128,7 @@ public class sp_approx {
                 x--;
             }
         }
-        return new String[] { result2.toString(), result1.toString() };
+        return new String[]{result2.toString(), result1.toString()};
     }
 
     public int[][] linear_table(boolean maximizing, String seq1, String seq2, int[][] scoreMatrix, int gap) {

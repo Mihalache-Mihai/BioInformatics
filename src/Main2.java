@@ -4,10 +4,6 @@ import java.util.List;
 
 public class Main2 {
 
- 
-
-
-
     public static ArrayList<String> readMultipleSeqFile(String filename, ArrayList<String>names) {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(new File(filename)));
@@ -48,7 +44,6 @@ public class Main2 {
             writer.println(multiple.get(0).toString());
             for (int i = 1; i < multiple.size(); i++) {
                 int j = i < minimum ? i - 1 : i;
-                System.out.println(multiple.get(i).toString());
                 writer.println(names.get(j));
                 writer.println(multiple.get(i).toString());
             }
