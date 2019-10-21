@@ -148,8 +148,15 @@ public class sp_approx {
         }
         for (int row = 1; row < resultedMatrix.length; row++) {
             for (int column = 1; column < resultedMatrix[0].length; column++) {
-                int subcost = scoreMatrix[alphabet.indexOf(seq2.charAt(row - 1))][alphabet
-                        .indexOf(seq1.charAt(column - 1))];
+                int letter1=alphabet.indexOf(seq1.charAt(column - 1));
+                if(letter1<0){
+                    letter1=0;
+                }
+                int letter2=alphabet.indexOf(seq2.charAt(row - 1));
+                if(letter2<0){
+                    letter2=0;
+                }
+                int subcost = scoreMatrix[letter2][letter1];
                 int expectedValue = subcost + resultedMatrix[row - 1][column - 1];
                 Operation op = Operation.SUB;
                 if (maximizing) {
@@ -194,8 +201,15 @@ public class sp_approx {
         }
         for (int row = 1; row < resultedMatrix.length; row++) {
             for (int column = 1; column < resultedMatrix[0].length; column++) {
-                int subcost = scoreMatrix[alphabet.indexOf(seq2.charAt(row - 1))][alphabet
-                        .indexOf(seq1.charAt(column - 1))];
+                int letter1=alphabet.indexOf(seq1.charAt(column - 1));
+                if(letter1<0){
+                    letter1=0;
+                }
+                int letter2=alphabet.indexOf(seq2.charAt(row - 1));
+                if(letter2<0){
+                    letter2=0;
+                }
+                int subcost = scoreMatrix[letter2][letter1];
                 int expectedValue = subcost + resultedMatrix[row - 1][column - 1];
                 Operation op = Operation.SUB;
                 if (maximizing) {
