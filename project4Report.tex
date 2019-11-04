@@ -1,0 +1,15 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\parindent0em
+\pagestyle{plain}
+\usepackage{float}
+\begin{document}
+	\section{Introduction}
+	RFDist is implemented and there are no known issues.
+	\section{Implementation}
+	The program is implemented with python. The trees are read by a Newick-parser from Bio.Phylo and afterwards translated into a self coded structure of nodes.\\
+	The program uses Day's algorithm as explained in the lecture to compute the distance.\\
+	We did the validation by testing the given trees and getting reasonable results in the experiments.\\
+	You can run it by invoking main.py with python3 and either give the files that contains the trees as arguments or type their names when the program asks for them.
+	\end{document}
