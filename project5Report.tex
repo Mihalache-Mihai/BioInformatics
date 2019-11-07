@@ -1,0 +1,20 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\parindent0em
+\pagestyle{plain}
+\usepackage{float}
+\begin{document}
+	\section{Introduction}
+	The program is working correctly on the test case.
+	\section{Implementation}
+	We used python3, you can invoke the file main.py either with the filename (containing the distance matrix) as an argument or answering the prompt for this file.\\
+	Differences from slide 62 are the following:\\
+	\begin{itemize}
+		\item The matrix n is not explicitly constructed, each element will be compared to the current minimum immediately after calculating it
+		\item Also there will be only $n_{ij}$ calculated, where $i<j$.
+		\item The values $r_i$ will only once be calculated by iterating over the complete matrix, afterwards there are calculated based on the last value in (each) constant time
+	\end{itemize}
+	\section{Experiments}
+	
+\end{document}
