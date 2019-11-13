@@ -38,11 +38,11 @@ class Node:
 
     def find(self,name):
         if(self.name==name):
-            return self
+            return [self]
         for c in self.children:
             found=c.find(name)
             if found is not None:
-                return found
+                return [self] + found
         return None
 
     def print(self,level=0):
@@ -93,6 +93,7 @@ def toTop(child):
     if(newParent is not None):
         newParent.children.append(child)
         newParent.children.remove(oldparent)
+    
 
 
 if len(sys.argv)<2:
@@ -111,7 +112,6 @@ tree2=Parser.read(file2,'newick')
 
 root1=Node(None,tree1.clade.name)
 root1.addChildren(tree1.clade)
-
 leaf=root1
 while not leaf.isLeaf():
     leaf=leaf.children[0]
@@ -119,23 +119,21 @@ while not leaf.isLeaf():
 while(leaf.parent is not None):
     toTop(leaf)
 
-
 root1=leaf
 
 root2=Node(None,tree2.clade.name)
 root2.addChildren(tree2.clade)
-leaf=root2.find(root1.name)
 
-while(leaf.parent is not None):
-    toTop(leaf)
+for n in root2.find(root1.name):
+    if(n.parent is not None):
+        toTop(n)
+        leaf=n
 
 root2=leaf
 #now step 1 is done and both are rooted with the same leaf
-
 origNames={}
 newNames={}
 cur=1
-
 leafs1=root1.getAllLeafs()
 for l in leafs1:
     origNames[cur]=l.name
@@ -151,18 +149,17 @@ for l in leafs2:
 
 root1.step4()
 intervals1=root1.getIntervalsOfChildNonTerminals()
-
 def eliminateWrong(intervals):
+    corrects=[]
     for i in intervals:
-        if i[1]-i[0] +1!= i[2]:
-            intervals.remove(i)
-    return intervals
+        if i[1]-i[0] +1== i[2]:
+            corrects.append(i)
+    return corrects
     
 
 root2.step4()
 intervals2=root2.getIntervalsOfChildNonTerminals()
 intervals2=eliminateWrong(intervals2)
-
 def eliminateDuplets(intervals):
     nIntervals=[intervals[0]]
     for i in range(1,len(intervals)):
