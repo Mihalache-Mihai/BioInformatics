@@ -112,23 +112,25 @@ tree2=Parser.read(file2,'newick')
 
 root1=Node(None,tree1.clade.name)
 root1.addChildren(tree1.clade)
+root1.print()
 leaf=root1
 while not leaf.isLeaf():
     leaf=leaf.children[0]
 
-while(leaf.parent is not None):
-    toTop(leaf)
-
-root1=leaf
-
-root2=Node(None,tree2.clade.name)
-root2.addChildren(tree2.clade)
-
-for n in root2.find(root1.name):
+for n in root1.find(leaf.name):
     if(n.parent is not None):
         toTop(n)
         leaf=n
 
+root1=leaf
+root2=Node(None,tree2.clade.name)
+root2.addChildren(tree2.clade)
+print("::::::::::::::::::::::")
+root2.print()
+for n in root2.find(root1.name):
+    if(n.parent is not None):
+        toTop(n)
+        leaf=n
 root2=leaf
 #now step 1 is done and both are rooted with the same leaf
 origNames={}
@@ -144,7 +146,6 @@ for l in leafs1:
 leafs2=root2.getAllLeafs()
 for l in leafs2:
     l.name=newNames[l.name]
-
 #now step 4 follows
 
 root1.step4()
@@ -156,7 +157,6 @@ def eliminateWrong(intervals):
             corrects.append(i)
     return corrects
     
-
 root2.step4()
 intervals2=root2.getIntervalsOfChildNonTerminals()
 intervals2=eliminateWrong(intervals2)
@@ -171,7 +171,6 @@ intervals1.sort()
 intervals2.sort()
 intervals1=eliminateDuplets(intervals1)
 intervals2=eliminateDuplets(intervals2)
-
 i=0
 j=0
 count=0
